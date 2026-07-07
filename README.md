@@ -114,26 +114,23 @@ Diagram di bawah membantu memahami **cara website jalan**, **flow harian admin**
 ```mermaid
 flowchart TB
     subgraph Admin["WordPress Admin"]
-        WPCode["WPCode: 3 snippet PHP"]
-        Page["Page Homepage"]
+        Theme["Theme: humic-theme"]
         HUMICMenu["Menu HUMIC Engineering"]
         HUMICMenu --> News["News / Events / Partners"]
         HUMICMenu --> Settings["Homepage / Contact / Vision / Research"]
     end
 
     subgraph Server["Server"]
-        Uploads["uploads/humic/ — style.css + script.js"]
-        WPCode --> Engine["humic-news.php · humic-pages.php · humic-extras.php"]
+        Uploads["wp-content/themes/humic-theme/"]
+        Theme --> Engine["inc/humic-news.php · inc/humic-pages.php · inc/humic-extras.php"]
     end
 
     subgraph Visitor["Pengunjung"]
         Browser["Browser"]
     end
 
-    Page --> Shortcodes["humic_header + main shortcodes + humic_footer"]
-    Engine --> Shortcodes
-    Engine --> Uploads
-    Shortcodes --> Browser
+    Engine --> Pages["front-page.php & archives"]
+    Pages --> Browser
     Uploads --> Browser
 ```
 
@@ -169,22 +166,11 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([Ubah file di komputer]) --> What{File apa?}
-
-    What -->|style.css saja| CSS["Upload → uploads/humic/style.css"]
-    What -->|script.js saja| JS["Upload → uploads/humic/script.js"]
-    What -->|humic-pages / humic-extras| PHP2["WPCode → paste snippet → Save"]
-    What -->|humic-news.php| PHP1["WPCode → HUMIC News & Layout → Save"]
-    What -->|Topbar / header rusak| Header["Deploy 3 file: humic-news.php + style.css + script.js"]
-    What -->|Judul Page muncul| Title["Deploy 2 file: style.css + humic-news.php"]
-
-    CSS --> Refresh["Ctrl+F5 · cek Network ?ver=1.3.2.xxx"]
-    JS --> Refresh
-    PHP1 --> Refresh
-    PHP2 --> Permalink["Settings → Permalinks → Save jika URL baru"]
-    PHP2 --> Refresh
-    Header --> Refresh
-    Title --> Refresh
+    Start([Ubah file di komputer]) --> Build["Jalankan build_theme.py"]
+    
+    Build --> Zip["humic-theme.zip terbuat"]
+    Zip --> Upload["Upload/Timpa via WordPress Themes / cPanel"]
+    Upload --> Refresh["Ctrl+F5 · Cek Perubahan"]
 
     Refresh --> Test["Uji: homepage · topbar · /research/ · mobile"]
     Test --> Done([Deploy selesai])
@@ -194,60 +180,20 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A([Mulai setup]) --> B[Install WordPress + WPCode]
-    B --> C["3 snippet PHP → Active"]
-    C --> D["Upload style.css + script.js ke uploads/humic/"]
-    D --> E["Buat Page homepage — 3 blok terpisah"]
-    E --> F["Settings → Reading → Homepage = Page tadi"]
-    F --> G["Settings → Permalinks → Save"]
-    G --> H{Uji website}
-    H -->|OK| I([Setup selesai])
-    H -->|Topbar / judul rusak| J["§16 / §22"]
-    H -->|Konten kosong| K["Pisah 3 blok — §6"]
-    J --> H
-    K --> H
+    A([Mulai setup]) --> B[Install WordPress]
+    B --> C["Upload humic-theme.zip di menu Themes"]
+    C --> D["Activate Theme"]
+    D --> E["Website Langsung Jalan!"]
 ```
-
-### E. Struktur homepage (3 blok)
-
-```mermaid
-flowchart TB
-    subgraph Page["Page WordPress — Homepage"]
-        B1["Blok 1 · Shortcode · humic_header"]
-        B2["Blok 2 · Custom HTML · main + shortcodes"]
-        B3["Blok 3 · Shortcode · humic_footer"]
-    end
-
-    B1 --> Topbar["Topbar merah — email + sosial"]
-    B1 --> Nav["Navbar — logo + menu"]
-    B2 --> Sections["hero → stats → about → research → news → events → partners → contact"]
-    B3 --> Footer["Footer situs"]
-```
-
-> **Penting:** Jangan gabung ketiga blok dalam satu block HTML. Lihat [§6](#6-membuat-homepage-3-blok-terpisah).
-
----
 
 ## 1. Gambaran Umum
 
-Website **HUMIC Engineering** dibangun dengan **WordPress**. Yang membuat tampilannya khas HUMIC (header merah, homepage, halaman Research, dll.) **bukan theme biasa atau Elementor**, melainkan kombinasi:
+Website **HUMIC Engineering** dibangun dengan **WordPress**. Tampilan khas HUMIC (header merah, homepage, halaman Research, dll.) dirender sepenuhnya oleh **Custom Standalone Theme**.
 
 | Komponen | Penjelasan sederhana |
 |---|---|
-| **3 snippet PHP** | Kode custom di plugin WPCode — seperti "mesin" website |
-| **style.css + script.js** | File tampilan & interaksi (warna, menu mobile, sticky header) |
-| **1 halaman WordPress (Page)** | Homepage berisi shortcode — seperti "placeholder" konten |
-
-### Bagian header website (penting dipahami)
-
-Header HUMIC punya **2 lapis**:
-
-| Lapis | Warna | Isi |
-|---|---|---|
-| **Topbar** | Merah (`#CC0000`, tinggi 36px) | Email, Telkom University, ikon sosial media |
-| **Navbar** | Putih | Logo, menu navigasi, tombol JOIN US |
-
-Keduanya dirender oleh shortcode `[humic_header]`. File yang mengatur header: **`humic-news.php`** (HTML + CSS kritis), **`style.css`** (tampilan), **`script.js`** (sticky desktop + menu mobile). **Ketiga file ini harus selaras** — jika topbar bermasalah, deploy ketiganya sekaligus (lihat [§16](#16-deploy-khusus-header--topbar-merah)).
+| **Theme `humic-theme`** | Tema WordPress kustom yang berisi seluruh logika, CPT, tampilan, dan integrasi front-end. |
+| **`front-page.php`** | File di dalam tema yang langsung merender seluruh isi landing page otomatis tanpa butuh builder tambahan. |
 
 ### Apa yang bisa dilakukan tanpa coding?
 
@@ -255,12 +201,6 @@ Keduanya dirender oleh shortcode `[humic_header]`. File yang mengatur header: **
 - Ubah teks/gambar **Hero**, **About**, **Stats**, **Contact**, **Vision & Mission**, **Research**
 - Ganti email, alamat, link sosial media
 - Upload logo partner, foto anggota, gambar hero
-
-### Apa yang perlu sedikit teknis?
-
-- Setup pertama kali (snippet WPCode, upload file)
-- Update `style.css` / `script.js` / snippet PHP
-- Troubleshooting jika homepage rusak
 
 ### Menu admin HUMIC
 
@@ -350,307 +290,26 @@ wp-content/
 
 ---
 
-## 5. Setup Awal — Langkah demi Langkah
+## 5. Setup Awal (Otomatis via Theme)
 
-Ikuti urutan ini jika website **belum pernah disetup** atau setup **dari awal** di hosting baru.
+Sistem terbaru menggunakan standalone theme humic-theme. Anda tidak perlu menggunakan WPCode atau Elementor.
 
----
+### Langkah 1 — Upload Theme
 
-### Langkah 1 — Install WordPress & login admin
+1. Login ke WordPress admin.
+2. Buka **Appearance → Themes → Add New → Upload Theme**.
+3. Upload humic-theme.zip.
+4. Klik **Install Now** dan **Activate**.
 
-1. Pastikan WordPress sudah terinstall di hosting.
-2. Buka `https://domain-anda.com/wp-admin`
-3. Login dengan akun admin.
+### Langkah 2 — Atur Permalink
 
----
+1. Buka **Settings → Permalinks**.
+2. Pilih **Post name** (recommended).
+3. Klik **Save Changes** (penting agar /research/, /news/, dll tidak error 404).
 
-### Langkah 2 — Install plugin WPCode
+### Langkah 3 — Verifikasi
 
-1. Di sidebar kiri admin, klik **Plugins → Add New**
-2. Cari **"WPCode"** (by WPCode / formerly Insert Headers and Footers)
-3. Klik **Install Now** → **Activate**
-4. Setelah aktif, menu **Code Snippets** (atau **WPCode**) muncul di sidebar
-
----
-
-### Langkah 3 — Buat snippet PHP pertama (`humic-news.php`)
-
-1. Buka **Code Snippets → + Add Snippet** (atau **Add New**)
-2. Pilih **Add Your Custom Code (New Snippet)**
-3. Isi pengaturan:
-
-  | Field | Nilai |
-  |---|---|
-  | **Snippet Title** | `HUMIC News & Layout` |
-  | **Code Type** | **PHP Snippet** |
-  | **Location / Insert Method** | **Auto Insert → Run Everywhere** |
-
-4. Di area kode, **hapus semua** isi default
-5. Buka file `humic-news.php` di komputer (pakai Notepad, VS Code, dll.)
-6. **Select All → Copy** seluruh isi file
-7. **Paste** ke editor WPCode
-8. Klik **Save Changes**
-9. Pastikan toggle/snippet status = **Active / Published**
-
-> Ulangi proses yang sama untuk `humic-pages.php` dan `humic-extras.php` (Langkah 4 & 5).
-
----
-
-### Langkah 4 — Buat snippet PHP kedua (`humic-pages.php`)
-
-| Field | Nilai |
-|---|---|
-| **Snippet Title** | `HUMIC Pages` |
-| **Code Type** | PHP Snippet |
-| **Location** | Run Everywhere |
-| **Isi kode** | Copy-paste seluruh `humic-pages.php` |
-
-Save → Active.
-
----
-
-### Langkah 5 — Buat snippet PHP ketiga (`humic-extras.php`)
-
-| Field | Nilai |
-|---|---|
-| **Snippet Title** | `HUMIC Extras` |
-| **Code Type** | PHP Snippet |
-| **Location** | Run Everywhere |
-| **Isi kode** | Copy-paste seluruh `humic-extras.php` |
-
-Save → Active.
-
-**Cek:** Ketiga snippet harus **Active**. Jika salah satu Nonaktif, fitur terkait tidak jalan (mis. Events hilang jika `humic-extras.php` mati).
-
----
-
-### Langkah 6 — Upload CSS, JS, dan gambar
-
-#### Opsi A — File Manager hosting (paling mudah untuk pemula)
-
-1. Login **cPanel** (atau panel hosting)
-2. Buka **File Manager**
-3. Navigasi ke: `public_html/wp-content/uploads/`
-   *(path bisa sedikit beda, mis. `www/` atau `htdocs/` — cari folder `wp-content`)*
-4. Klik **+ Folder** → buat folder baru bernama **`humic`**
-5. Masuk ke folder `humic`
-6. Klik **Upload**
-7. Upload file: `style.css`, `script.js`, dan semua gambar yang ada di folder project
-
-#### Opsi B — FTP (FileZilla)
-
-1. Connect ke server dengan kredensial FTP
-2. Buka folder remote: `/wp-content/uploads/`
-3. Buat folder `humic` jika belum ada
-4. Drag & drop `style.css`, `script.js`, dan gambar ke folder tersebut
-
-**Verifikasi:** Buka browser → `https://domain-anda.com/wp-content/uploads/humic/style.css` — jika muncul teks CSS (bukan 404), upload berhasil.
-
----
-
-### Langkah 7 — Atur Permalink
-
-1. Di wp-admin: **Settings → Permalinks**
-2. Pilih **Post name** (recommended): `https://site.com/sample-post/`
-3. Klik **Save Changes** (meski tidak mengubah apa pun — ini "refresh" URL rules)
-
-Ini penting agar halaman `/research/`, `/news/`, `/events/` tidak error 404.
-
----
-
-### Langkah 8 — Buat & set Homepage
-
-1. **Pages → Add New**
-2. Judul halaman: mis. **Homepage Humic** atau **Beranda** — **boleh diisi** (hanya untuk admin, lihat [Nama Page homepage](#nama-page-homepage--judul-di-admin))
-3. Isi konten — lihat [§6](#6-membuat-homepage-3-blok-terpisah) (3 blok terpisah!)
-4. Klik **Publish**
-5. Buka **Settings → Reading**
-6. Di **Your homepage displays**, pilih **A static page**
-7. **Homepage:** pilih halaman yang baru dibuat
-8. Klik **Save Changes**
-
----
-
-### Langkah 9 — Verifikasi setup berhasil
-
-Buka website di browser (mode incognito / tanpa login lebih baik):
-
-| Cek | Harus terlihat |
-|---|---|
-| Homepage `/` | Hero, stats, about, news, events, partners, contact — **tanpa** judul Page WordPress di bawah navbar |
-| Topbar merah | Email + ikon sosial di atas navbar |
-| Menu desktop | Logo, navigasi, tombol Contact |
-| Menu mobile (kecilkan jendela / HP) | Icon burger (☰), menu slide |
-| `/research/` | Halaman research dengan accordion |
-| `/vision-mission/` | Halaman vision |
-| `/news/` | Arsip berita |
-| `/events/` | Arsip event |
-
-Di admin, cek sidebar: menu **HUMIC Engineering** (ikon gedung) harus muncul.
-
----
-
-## 6. Membuat Homepage (3 Blok Terpisah)
-
-Ini bagian **paling penting**. Homepage **harus** punya **3 blok terpisah**. Jangan digabung jadi satu!
-
-### Kenapa harus 3 blok?
-
-Header website punya script khusus yang memindahkan elemen ke posisi benar. Jika header + konten + footer digabung dalam **satu** blok HTML, script bisa jalan sebelum konten `<main>` selesai dimuat → **homepage kosong di bawah header** (bug yang pernah terjadi berkali-kali).
-
----
-
-### Blok 1 — Header
-
-1. Edit Page homepage (**Pages → Home → Edit**)
-2. Klik **+** (tambah block)
-3. Cari block **Shortcode**
-4. Ketik:
-
-```
-[humic_header active="home"]
-```
-
-5. Block ini harus jadi **block paling atas** (di atas semua konten lain)
-
----
-
-### Blok 2 — Konten utama
-
-1. Klik **+** di bawah block header
-2. Cari block **Custom HTML** (atau **HTML**)
-3. Buka file `index-widget-main.html` di komputer
-4. Copy **seluruh isi** file tersebut
-5. Paste ke block Custom HTML
-
-Isi lengkapnya (untuk referensi):
-
-```html
-<main>
-
-[humic_hero]
-
-[humic_stats_bar]
-
-[humic_about]
-
-[humic_research_areas]
-
-<section id="news" class="news">
-  <div class="container">
-    <div class="section-hdr">
-      <div>
-        <span class="eyebrow">Stay Updated</span>
-        <h2 class="section-title">Latest News</h2>
-      </div>
-      <a href="[humic_news_url]" class="link-arr">View All <i class="fa-solid fa-arrow-up-right"></i></a>
-    </div>
-    [humic_news]
-  </div>
-</section>
-
-<section id="events" class="events-home">
-  <div class="container">
-    <div class="section-hdr">
-      <div>
-        <span class="eyebrow">What's On</span>
-        <h2 class="section-title">Upcoming Events</h2>
-      </div>
-      <a href="[humic_events_url]" class="link-arr">View All Events <i class="fa-solid fa-arrow-up-right"></i></a>
-    </div>
-    [humic_events_home]
-  </div>
-</section>
-
-<section id="partners" class="partners">
-  <div class="container">
-    <div class="section-hdr section-hdr-center">
-      <div class="section-hdr-inner">
-        <span class="eyebrow">Collaborations</span>
-        <h2 class="section-title">Our Partners</h2>
-      </div>
-    </div>
-    [humic_partners]
-  </div>
-</section>
-
-<section id="contact" class="contact">
-  <div class="container">
-    <div class="section-hdr section-hdr-center">
-      <div class="section-hdr-inner">
-        <span class="eyebrow">Get In Touch</span>
-        <h2 class="section-title">Contact Us</h2>
-      </div>
-    </div>
-    <div class="contact-boxes contact-boxes-duo">
-      [humic_contact_office]
-      [humic_contact_keluhan]
-    </div>
-  </div>
-</section>
-
-</main>
-```
-
-**Catatan untuk pemula:**
-- Teks seperti `Stay Updated` / `Latest News` bisa diedit langsung di HTML ini jika mau ganti judul section
-- Shortcode dalam `[kurung]` **jangan dihapus** kecuali Anda paham konsekuensinya
-- `[humic_news_url]` dll. otomatis jadi link saat halaman ditampilkan
-
----
-
-### Blok 3 — Footer
-
-1. Klik **+** di bawah block Custom HTML
-2. Tambah block **Shortcode**
-3. Ketik:
-
-```
-[humic_footer]
-```
-
----
-
-### Simpan & preview
-
-1. Klik **Update** / **Publish**
-2. Klik **Preview** atau buka homepage di tab baru
-3. Scroll dari atas ke bawah — semua section harus muncul
-
-### Struktur visual (harus seperti ini)
-
-```
-┌─────────────────────────────┐
-│  BLOK 1: [humic_header]     │  ← Shortcode block
-├─────────────────────────────┤
-│  BLOK 2: <main> ...         │  ← Custom HTML block
-│    hero, stats, about,      │
-│    news, events, partners,  │
-│    contact                  │
-├─────────────────────────────┤
-│  BLOK 3: [humic_footer]     │  ← Shortcode block
-└─────────────────────────────┘
-```
-
----
-
-### Nama Page homepage & judul di admin
-
-Di editor WordPress, teks besar di **paling atas** (mis. `Homepage Humic`) adalah **Title Page** — dipakai agar halaman mudah dikenali di **Pages → All Pages** dan **Settings → Reading**.
-
-| Pertanyaan | Jawaban |
-|---|---|
-| Boleh kasih nama? | **Ya** — contoh: `Homepage Humic`, `Beranda HUMIC` |
-| Akan muncul di website? | **Tidak** (versi **1.3.2+**) — CSS project otomatis menyembunyikan judul theme WordPress (`.wp-block-post-title`) |
-| Judul section hero/news? | Itu dari shortcode HUMIC — **bukan** Title Page, tidak terpengaruh |
-
-**Jika judul Page masih muncul** di bawah navbar (teks besar centered):
-
-1. Upload `style.css` terbaru → `uploads/humic/`
-2. Update snippet WPCode **HUMIC News & Layout** (`humic-news.php` — ada CSS kritis yang sama)
-3. **Ctrl+F5** + purge cache
-
-> **Catatan:** Jangan campur dengan **topbar merah** (email + sosial). Topbar = bagian header HUMIC; judul Page = output theme WordPress di bawah navbar.
+Buka halaman utama website. Homepage dengan seluruh block (Hero, Stats, About, News, Events, Partners, Contact) akan langsung ter-render dengan sempurna secara otomatis tanpa perlu membuat Page baru.
 
 ---
 
@@ -1061,131 +720,29 @@ Shortcode = kode dalam `[kurung]` yang WordPress ubah jadi tampilan.
 
 ---
 
-## 12. Kapan Perlu Deploy?
+## 12. Deploy & Update Theme
 
-| Anda mengubah… | File lokal | Upload ke… | Perlu update WPCode? |
-|---|---|---|---|
-| Warna, layout, spacing | `style.css` | `uploads/humic/` | Tidak |
-| Menu mobile, sticky header, accordion | `script.js` | `uploads/humic/` | Tidak |
-| Gambar statis (logo, ilustrasi) | `image-*.png` | `uploads/humic/` | Tidak |
-| Perubahan header/topbar/sticky | `humic-news.php` + `style.css` + `script.js` | uploads + WPCode | **Ya (ketiga file)** |
-| News, shortcode, muat CSS/JS (tanpa ubah header) | `humic-news.php` | WPCode snippet | **Ya** |
-| Hero, About, halaman virtual, Members | `humic-pages.php` | WPCode snippet | **Ya** |
-| Events, Partners | `humic-extras.php` | WPCode snippet | **Ya** |
-| Teks berita, event, partner, dll. | — | wp-admin saja | **Tidak** (cukup Publish di admin) |
-| Hide judul Page WordPress di homepage | `style.css` + `humic-news.php` | uploads + WPCode | **Ya (2 file, bukan script.js)** |
+Karena website ini menggunakan Standalone Theme, proses update sangat mudah. Kapan Anda perlu melakukan deploy?
 
-**Aturan praktis:** ubah konten lewat admin → tidak perlu deploy file. Ubah file di folder project → deploy sesuai tabel di atas.
+1. Jika Anda mengubah desain (CSS) di file style.css.
+2. Jika Anda mengubah interaksi / menu mobile di file script.js.
+3. Jika Anda mengubah logika sistem di dalam file PHP mana pun (humic-news.php, humic-pages.php, dll).
 
----
+### Cara Deploy Otomatis (Lokal)
 
-## 13. Deploy CSS / JS
+Jika Anda sedang men-develop di lokal:
+1. Jalankan python build_theme.py di terminal.
+2. Script ini akan merakit semua file ke dalam folder humic-theme dan membungkusnya menjadi humic-theme.zip.
+3. Copy folder humic-theme tersebut dan timpa (overwrite) isi folder wp-content/themes/humic-theme di XAMPP/server lokal Anda.
 
-### Opsi A — File Manager (cPanel / hosting panel)
+### Cara Deploy ke Hosting Server
 
-1. Login panel hosting → buka **File Manager**
-2. Navigasi ke `public_html/wp-content/uploads/humic/`
-   *(path bisa `www/` atau `htdocs/` — cari folder `wp-content`)*
-3. Klik **Upload**
-4. Pilih `style.css` dan/atau `script.js` dari komputer
-5. Konfirmasi **Overwrite / Replace** jika ditanya
-6. Buka website → **Ctrl+F5** (Windows) atau **Cmd+Shift+R** (Mac)
-7. Lanjut ke [§17 Cek versi](#17-cek-versi-asset-sudah-ke-load) dan [§20 Testing](#20-testing-setelah-deploy)
-
-### Opsi B — FTP (FileZilla)
-
-1. Connect ke server
-2. Remote folder: `/wp-content/uploads/humic/`
-3. Drag & drop file dari komputer → **Overwrite**
-4. Hard refresh browser → cek versi & testing
-
-### Verifikasi cepat
-
-Buka di browser:
-
-```
-https://domain-anda.com/wp-content/uploads/humic/style.css
-```
-
-Jika muncul teks CSS (bukan 404), file sudah ada di server.
-
----
-
-## 14. Deploy Snippet PHP (WPCode)
-
-Lakukan ini jika `humic-news.php`, `humic-pages.php`, atau `humic-extras.php` berubah.
-
-1. Login **wp-admin**
-2. Buka **Code Snippets** (WPCode)
-3. Klik snippet yang sesuai:
-
-  | File lokal | Snippet WPCode |
-  |---|---|
-  | `humic-news.php` | HUMIC News & Layout |
-  | `humic-pages.php` | HUMIC Pages |
-  | `humic-extras.php` | HUMIC Extras |
-
-4. Di editor kode: **Select All** → hapus → **paste** seluruh isi file lokal terbaru
-5. Pastikan:
-  - **Code Type** = PHP Snippet
-  - **Location** = Run Everywhere (atau setara)
-  - Status = **Active**
-6. Klik **Save Changes**
-7. Jika menambah URL/halaman baru: **Settings → Permalinks → Save Changes**
-8. Hard refresh → testing ([§20](#20-testing-setelah-deploy))
-
-> **Penting:** paste **seluruh** file, jangan sebagian — snippet harus utuh.
-
----
-
-## 15. Deploy Lengkap (Semua File)
-
-Gunakan saat **serah terima project**, pindah hosting, atau deploy versi besar.
-
-> Panduan setup dari nol (install WPCode, buat homepage, dll.): **[§5 Setup Awal](#5-setup-awal--langkah-demi-langkah)**
-
-### Checklist urutan
-
-- [ ] **Backup** database + folder `wp-content/uploads/` (termasuk `humic/`)
-- [ ] Upload `style.css` + `script.js` + gambar → `wp-content/uploads/humic/`
-- [ ] Update 3 snippet WPCode (copy-paste dari file `.php` lokal)
-- [ ] Pastikan ketiga snippet **Active**
-- [ ] **Settings → Permalinks → Save**
-- [ ] (Opsional) Bump `HUMIC_ASSET_VERSION` di `humic-news.php` sebelum paste ke WPCode
-- [ ] Hard refresh + purge cache
-- [ ] Jalankan semua item [§20 Testing](#20-testing-setelah-deploy)
-
----
-
-## 16. Deploy Khusus Header / Topbar Merah
-
-Gunakan checklist ini jika **topbar merah hilang**, hanya **garis merah tipis**, atau **header sticky** bermasalah.
-
-Header HUMIC = **3 file yang harus selalu selaras**:
-
-| # | File | Tujuan |
-|---|---|---|
-| 1 | `humic-news.php` | WPCode → snippet **HUMIC News & Layout** |
-| 2 | `style.css` | `wp-content/uploads/humic/style.css` |
-| 3 | `script.js` | `wp-content/uploads/humic/script.js` |
-
-### Langkah (urutan wajib)
-
-1. **Backup** ketiga file di server (download copy lama)
-2. Upload `style.css` + `script.js` → timpa di `uploads/humic/`
-3. WPCode → **HUMIC News & Layout** → paste seluruh `humic-news.php` → **Save** → pastikan **Active**
-4. **Ctrl+F5** + purge cache plugin/CDN
-5. Buka **Network tab** (F12) → pastikan `?ver=1.3.2.xxx`
-6. Uji topbar di kondisi berikut:
-
-| Kondisi | Harus terlihat |
-|---|---|
-| **Logout** (incognito) | Bar merah 36px + email + ikon sosial |
-| **Login admin** | Topbar tetap penuh, tidak tertutup admin bar WP |
-| **Scroll desktop** | Header sticky, topbar tidak hilang |
-| **HP / mobile** | Topbar disembunyikan (normal), burger menu jalan |
-
-> **Jangan** deploy hanya `style.css` tanpa `humic-news.php` jika masalah topbar — CSS kritis header ada di snippet PHP juga.
+1. Pastikan Anda sudah menjalankan python build_theme.py.
+2. Login ke WordPress wp-admin di server.
+3. Masuk ke **Appearance → Themes → Add New → Upload Theme**.
+4. Upload humic-theme.zip.
+5. WordPress akan bertanya apakah Anda ingin menimpa tema yang lama. Pilih **Replace current with uploaded**.
+6. Selesai! Buka website dan tekan **Ctrl+F5** untuk melihat perubahan.
 
 ---
 
