@@ -14,6 +14,14 @@ add_action('after_setup_theme', function() {
     add_theme_support('html5', array('search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script'));
 });
 
+// Remove trailing dash if tagline is empty
+add_filter('document_title_parts', function($title) {
+    if (isset($title['tagline']) && trim($title['tagline']) === '') {
+        unset($title['tagline']);
+    }
+    return $title;
+});
+
 // Add humic-custom-layout body class unconditionally
 add_filter('body_class', function($classes) {
     if (!in_array('humic-custom-layout', $classes)) {
