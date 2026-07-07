@@ -74,7 +74,22 @@ Developed by **Dhimmas** (2026), this system is built entirely from scratch comp
 
 ---
 
-## Mulai dari Sini (Quick Start)
+## 🚀 Instalasi Cepat via Theme (Sangat Direkomendasikan)
+Jika Anda ingin memasang sistem arsitektur ini di website WordPress baru, Anda **TIDAK PERLU** melakukan setup *coding* manual atau meng-*install* plugin WPCode. 
+
+Gunakan file **`humic-theme.zip`** yang sudah tersedia di *repository* ini!
+
+1. Buka WordPress Dashboard Anda.
+2. Masuk ke menu **Appearance > Themes > Add New > Upload Theme**.
+3. Pilih file `humic-theme.zip` dan klik **Install Now**.
+4. Klik **Activate**.
+
+> [!SUCCESS]
+> **Selesai!** Seluruh arsitektur *Custom Post Type* (News, Events, IPR, dll), desain antarmuka (CSS), animasi, dan logika website akan langsung terpasang dan berjalan secara otomatis. Anda siap menggunakan sistem ini!
+
+---
+
+## Mulai dari Sini (Panduan Lanjutan)
 
 | Situasi Anda | Baca bagian ini |
 |---|---|
