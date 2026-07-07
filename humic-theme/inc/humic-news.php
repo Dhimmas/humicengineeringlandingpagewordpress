@@ -1183,73 +1183,17 @@
         return humic_should_suppress_theme_shell();
     }
 
-    function humic_get_asset_candidates($filename) {
-        $paths = array(
-            WP_CONTENT_DIR . '/uploads/humic/' . $filename,
-            WP_CONTENT_DIR . '/uploads/2026/06/' . $filename,
-        );
-        if ($filename === 'style.css') {
-            $paths[] = WP_CONTENT_DIR . '/uploads/humic-news-pages.css';
-        }
-        $paths[] = dirname(__FILE__) . '/' . $filename;
-        return $paths;
-    }
-
-    function humic_resolve_asset_path($filename) {
-        foreach (humic_get_asset_candidates($filename) as $path) {
-            if (is_readable($path)) {
-                return $path;
-            }
-        }
-        return '';
-    }
-
-    function humic_asset_path_to_url($path) {
-        $content_dir = wp_normalize_path(WP_CONTENT_DIR);
-        $asset_path  = wp_normalize_path($path);
-        if (strpos($asset_path, $content_dir) === 0) {
-            return content_url(substr($asset_path, strlen($content_dir)));
-        }
-        return '';
-    }
-
     function humic_enqueue_site_stylesheet() {
-        $css_path = humic_resolve_asset_path('style.css');
-        if ($css_path === '') {
-            return;
-        }
-
-        $version = HUMIC_ASSET_VERSION . '.' . (string) filemtime($css_path);
+        $version = HUMIC_ASSET_VERSION;
         $deps    = array('humic-google-fonts', 'humic-fontawesome');
-        $css_url = humic_asset_path_to_url($css_path);
-
-        if ($css_url !== '') {
-            wp_enqueue_style('humic-site', $css_url, $deps, $version);
-            return;
-        }
-
-        wp_register_style('humic-site', false, $deps, $version);
-        wp_enqueue_style('humic-site');
-        wp_add_inline_style('humic-site', file_get_contents($css_path));
+        $css_url = get_template_directory_uri() . '/style.css';
+        wp_enqueue_style('humic-site', $css_url, $deps, $version);
     }
 
     function humic_enqueue_site_script() {
-        $js_path = humic_resolve_asset_path('script.js');
-        if ($js_path === '') {
-            return;
-        }
-
-        $version = HUMIC_ASSET_VERSION . '.' . (string) filemtime($js_path);
-        $js_url  = humic_asset_path_to_url($js_path);
-
-        if ($js_url !== '') {
-            wp_enqueue_script('humic-site', $js_url, array(), $version, true);
-            return;
-        }
-
-        wp_register_script('humic-site', false, array(), $version, true);
-        wp_enqueue_script('humic-site');
-        wp_add_inline_script('humic-site', file_get_contents($js_path));
+        $version = HUMIC_ASSET_VERSION;
+        $js_url  = get_template_directory_uri() . '/assets/script.js';
+        wp_enqueue_script('humic-site', $js_url, array(), $version, true);
     }
 
     function humic_news_asset_url($filename) {
