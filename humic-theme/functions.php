@@ -34,3 +34,4 @@ add_filter('body_class', function($classes) {
 require_once get_template_directory() . '/inc/humic-news.php';
 require_once get_template_directory() . '/inc/humic-pages.php';
 require_once get_template_directory() . '/inc/humic-extras.php';
+require_once get_template_directory() . '/inc/humic-seo.php';
