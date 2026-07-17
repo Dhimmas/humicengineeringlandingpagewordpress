@@ -3234,7 +3234,7 @@ body.humic-custom-layout .footer {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 48px;
+  margin-bottom: 24px;
 }
 
 .humic-page-hdr .eyebrow {
@@ -3242,6 +3242,7 @@ body.humic-custom-layout .footer {
 }
 
 .humic-page-hdr .section-title {
+  margin-bottom: 0;
   max-width: 900px;
 }
 
