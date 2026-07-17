@@ -1655,20 +1655,8 @@
                 <h2 class="title">Header &amp; Footer Social Media</h2>
                 <table class="form-table" role="presentation">
                     <tr>
-                        <th scope="row"><label for="humic_social_facebook">Facebook</label></th>
-                        <td><input type="url" id="humic_social_facebook" name="humic_social_facebook" value="<?php echo esc_attr($social_facebook); ?>" class="large-text"></td>
-                    </tr>
-                    <tr>
                         <th scope="row"><label for="humic_social_instagram">Instagram</label></th>
                         <td><input type="url" id="humic_social_instagram" name="humic_social_instagram" value="<?php echo esc_attr($social_instagram); ?>" class="large-text"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><label for="humic_social_linkedin">LinkedIn</label></th>
-                        <td><input type="url" id="humic_social_linkedin" name="humic_social_linkedin" value="<?php echo esc_attr($social_linkedin); ?>" class="large-text"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><label for="humic_social_youtube">YouTube</label></th>
-                        <td><input type="url" id="humic_social_youtube" name="humic_social_youtube" value="<?php echo esc_attr($social_youtube); ?>" class="large-text"></td>
                     </tr>
                 </table>
                 <p class="description">Social links appear in the header topbar and footer. Research area links in the footer use settings from <strong>Research Areas</strong>.</p>
