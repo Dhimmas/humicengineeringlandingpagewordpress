@@ -2056,7 +2056,7 @@ body.humic-mobile-nav-open {
 .rcard-accordion-head {
   display: block;
   width: 100%;
-  padding: 36px 48px;
+  padding: 28px 48px;
   background: none;
   border: none;
   cursor: pointer;
@@ -2111,18 +2111,17 @@ body.humic-mobile-nav-open {
   transition:
     max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.35s ease,
-    padding 0.35s ease,
     border-color 0.35s ease;
 }
 
 .rcard-accordion.is-expanded .rcard-accordion-body {
   opacity: 1;
-  padding: 0 48px 48px;
+  padding: 0 48px 40px;
   border-top: 1px solid #f3f4f6;
 }
 
 .rcard-accordion-body .rcard-desc {
-  margin: 24px 0 20px;
+  margin: 18px 0 20px;
 }
 
 .rcard-accordion-detail {
