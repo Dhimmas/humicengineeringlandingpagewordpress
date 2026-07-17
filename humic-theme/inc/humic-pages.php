@@ -327,10 +327,7 @@
 
     function humic_get_social_networks() {
         return array(
-            'facebook'  => array('label' => 'Facebook',  'icon' => 'fa-brands fa-facebook-f'),
             'instagram' => array('label' => 'Instagram', 'icon' => 'fa-brands fa-instagram'),
-            'linkedin'  => array('label' => 'LinkedIn',  'icon' => 'fa-brands fa-linkedin-in'),
-            'youtube'   => array('label' => 'YouTube',   'icon' => 'fa-brands fa-youtube'),
         );
     }
 
